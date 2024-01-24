@@ -1,4 +1,4 @@
-# from pprint import pprint
+from pprint import pprint
 import copy
 import pandas as pd
 
@@ -17,15 +17,15 @@ class LotteryRater:
         self.fifthp_data = []
 
     def setup(self):
-        self.fstp_data = self.read_data("FirstPrize")
-        self.head_3_data = self.read_data("ThreeDigitPrefix")
-        self.tail_3_data = self.read_data("ThreeDigitSuffix")
-        self.tail_2_data = self.read_data("TwoDigitSuffix")
-        self.fstp_neighbor_data = self.read_data("FirstPrizeNeighbors")
-        self.sndp_data = self.read_data("SecondPrize")
-        self.trdp_data = self.read_data("ThirdPrize")
-        self.fourthp_data = self.read_data("FourthPrize")
-        self.fifthp_data = self.read_data("FifthPrize")
+        self.fstp_data = self.read_data("FirstPrize", 6)
+        self.head_3_data = self.read_data("ThreeDigitPrefix", 3)
+        self.tail_3_data = self.read_data("ThreeDigitSuffix", 3)
+        self.tail_2_data = self.read_data("TwoDigitSuffix", 2)
+        self.fstp_neighbor_data = self.read_data("FirstPrizeNeighbors", 6)
+        self.sndp_data = self.read_data("SecondPrize", 6)
+        self.trdp_data = self.read_data("ThirdPrize", 6)
+        self.fourthp_data = self.read_data("FourthPrize", 6)
+        self.fifthp_data = self.read_data("FifthPrize", 6)
 
     def run(self):
         self.setup()
@@ -40,9 +40,12 @@ class LotteryRater:
         return "".join(lottery_number)
 
     @staticmethod
-    def read_data(filename: str) -> list:
+    def read_data(filename: str, ndigit: int) -> list:
         file_path = f"datas/{filename}.csv"
         df = pd.read_csv(file_path, dtype=str)
+        df[filename] = pd.to_numeric(df[filename], errors='coerce')
+        df = df.dropna()
+        df[filename] = df[filename].astype(int).astype(str).str.zfill(ndigit)
         return df[filename].values.tolist()
 
     @staticmethod
